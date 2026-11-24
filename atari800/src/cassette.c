@@ -35,6 +35,7 @@
 #include "log.h"
 #include "util.h"
 #include "pokey.h"
+#include "statesav.h"
 
 static IMG_TAPE_t *cassette_file = NULL;
 
@@ -469,3 +470,86 @@ int CASSETTE_WriteFromMemory(UWORD src_addr, int length)
 /*
 vim:ts=4:sw=4:
 */
+
+#if !defined(BASIC) || defined(__LIBRETRO__)
+/* The OS holds Start and then presses Space as it boots from tape, and the tape
+   is read as the program loads. Run-ahead loads a state every frame, so a state
+   without these loses the presses and puts the tape back to the wrong place. */
+#define STATE_INTS 14
+
+static void GetStateInts(int *s)
+{
+	unsigned int block = 0;
+	int block_length = 0;
+	int next_blockbyte = 0;
+
+	s[0] = (int)event_time_left;
+	s[1] = pending_serin;
+	s[2] = passing_gap;
+	s[3] = pending_serin_byte;
+	s[4] = serin_byte;
+	s[5] = cassette_gapdelay;
+	s[6] = cassette_motor;
+	s[7] = CASSETTE_hold_start;
+	s[8] = CASSETTE_press_space;
+	s[9] = eof_of_tape;
+	s[10] = cassette_file != NULL
+	        && IMG_TAPE_GetReadState(cassette_file, &block, &block_length, &next_blockbyte);
+	s[11] = (int)block;
+	s[12] = block_length;
+	s[13] = next_blockbyte;
+}
+
+static void SetStateInts(const int *s)
+{
+	event_time_left = s[0];
+	pending_serin = s[1];
+	passing_gap = s[2];
+	pending_serin_byte = (UBYTE)s[3];
+	serin_byte = (UBYTE)s[4];
+	cassette_gapdelay = s[5];
+	cassette_motor = s[6];
+	CASSETTE_hold_start = s[7];
+	CASSETTE_press_space = s[8];
+	eof_of_tape = s[9];
+	if (s[10] && cassette_file != NULL && !CASSETTE_record)
+		IMG_TAPE_SetReadState(cassette_file, (unsigned int)s[11], s[12], s[13]);
+	UpdateFlags();
+}
+#endif
+
+#ifndef BASIC
+void CASSETTE_StateSave(void)
+{
+	int s[STATE_INTS];
+
+	GetStateInts(s);
+	StateSav_SaveINT(s, STATE_INTS);
+}
+
+void CASSETTE_StateRead(void)
+{
+	int s[STATE_INTS];
+
+	StateSav_ReadINT(s, STATE_INTS);
+	SetStateInts(s);
+}
+#endif
+
+#if defined(__LIBRETRO__)
+void Retro_CASSETTE_StateSave(void)
+{
+	int s[STATE_INTS];
+
+	GetStateInts(s);
+	Retro_SaveINT(s, STATE_INTS);
+}
+
+void Retro_CASSETTE_StateRead(void)
+{
+	int s[STATE_INTS];
+
+	Retro_ReadINT(s, STATE_INTS);
+	SetStateInts(s);
+}
+#endif

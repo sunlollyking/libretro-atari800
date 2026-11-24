@@ -92,4 +92,13 @@ extern int CASSETTE_readable;
    read-only. */
 extern int CASSETTE_writable;
 
+/* Save states hold the tape's place, so that a state loaded part way through
+   loading a tape carries on from the same point. */
+void CASSETTE_StateSave(void);
+void CASSETTE_StateRead(void);
+#if defined(__LIBRETRO__)
+void Retro_CASSETTE_StateSave(void);
+void Retro_CASSETTE_StateRead(void);
+#endif
+
 #endif /* CASSETTE_H_ */

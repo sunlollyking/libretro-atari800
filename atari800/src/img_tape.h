@@ -74,6 +74,13 @@ unsigned int IMG_TAPE_GetSize(IMG_TAPE_t *file);
 /* Positions the file at the start of a block given in POSITION (counted from
    0). */
 void IMG_TAPE_Seek(IMG_TAPE_t *file, unsigned int position);
+/* The reading position, for save states: the current block, the length of the
+   block held in the buffer (0 if none is held) and the next byte in it.
+   Returns FALSE while the tape is being written. */
+int IMG_TAPE_GetReadState(IMG_TAPE_t *file, unsigned int *block, int *block_length, int *next_blockbyte);
+/* Puts back a reading position from IMG_TAPE_GetReadState(), loading the held
+   block again. Returns FALSE if that block can't be loaded. */
+int IMG_TAPE_SetReadState(IMG_TAPE_t *file, unsigned int block, int block_length, int next_blockbyte);
 
 /* Returns direct state of POKEY's serial input port during tape reading.
    EVENT_TIME_LEFT is number of CPU ticks left till the end of the byte that's

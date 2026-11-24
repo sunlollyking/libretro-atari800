@@ -497,6 +497,31 @@ void IMG_TAPE_Seek(IMG_TAPE_t *file, unsigned int position)
 	file->block_length = 0;
 }
 
+int IMG_TAPE_GetReadState(IMG_TAPE_t *file, unsigned int *block, int *block_length, int *next_blockbyte)
+{
+	if (file->was_writing)
+		return FALSE;
+	*block = file->current_block;
+	*block_length = file->block_length;
+	*next_blockbyte = file->next_blockbyte;
+	return TRUE;
+}
+
+int IMG_TAPE_SetReadState(IMG_TAPE_t *file, unsigned int block, int block_length, int next_blockbyte)
+{
+	int gap;
+
+	IMG_TAPE_Seek(file, block);
+	if (block_length == 0)
+		return TRUE;
+	/* With no block held, ReadNextRecord() loads the current one. */
+	if (block >= (unsigned int)file->num_blocks || !ReadNextRecord(file, &gap)
+	    || file->block_length != block_length)
+		return FALSE;
+	file->next_blockbyte = next_blockbyte < block_length ? next_blockbyte : block_length;
+	return TRUE;
+}
+
 int IMG_TAPE_SerinStatus(IMG_TAPE_t *file, int event_time_left)
 {
 	if (file->was_writing || file->next_blockbyte == 0)

@@ -55,6 +55,7 @@ int Retro_SaveState_Size = 0;
 #include "statesav.h"
 #include "antic.h"
 #include "cartridge.h"
+#include "cassette.h"
 #include "cpu.h"
 #include "gtia.h"
 #include "log.h"
@@ -76,7 +77,7 @@ int Retro_SaveState_Size = 0;
 #include "xep80.h"
 #endif
 
-#define SAVE_VERSION_NUMBER 10 /* Version 9 adds Atari800_nframes, 10 GTIA_consol_override */
+#define SAVE_VERSION_NUMBER 11 /* Version 9 adds Atari800_nframes, 10 GTIA_consol_override, 11 the tape's place */
 
 #if defined(MEMCOMPR) || defined(LIBATARI800)
 /* libatari800 pretends to care about libz but it doesn't */
@@ -528,6 +529,7 @@ int Retro_SaveAtariState(uint8_t* data, size_t size, UBYTE SaveVerbose)
 #else
 	{ int local_xld_enabled = FALSE; Retro_SaveINT(&local_xld_enabled, 1); }
 #endif
+	Retro_CASSETTE_StateSave();
 
 	memstream_close(state_stream); state_stream = NULL;
 	if (state_stream_error) return FALSE;
@@ -592,6 +594,8 @@ int Retro_ReadAtariState(const uint8_t* data, size_t size)
 		{ int local_xld_enabled; Retro_ReadINT(&local_xld_enabled, 1); if (local_xld_enabled) goto error; }
 #endif
 	}
+	if (StateVersion >= 11)
+		Retro_CASSETTE_StateRead();
 
 	memstream_close(state_stream); state_stream = NULL;
 	if (state_stream_error) return FALSE;
@@ -674,6 +678,7 @@ int StateSav_SaveAtariState(const char *filename, const char *mode, UBYTE SaveVe
 		StateSav_SaveINT(&local_xld_enabled, 1);
 	}
 #endif /* PBI_XLD */
+	CASSETTE_StateSave();
 #ifdef DREAMCAST
 	DCStateSave();
 #endif
@@ -806,6 +811,8 @@ int StateSav_ReadAtariState(const char *filename, const char *mode)
 		}
 #endif /* PBI_XLD */
 	}
+	if (StateVersion >= 11)
+		CASSETTE_StateRead();
 #ifdef DREAMCAST
 	DCStateRead();
 #endif
