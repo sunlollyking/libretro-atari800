@@ -814,8 +814,8 @@ static void update_variables(void)
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
     {
-        if (content_has_tag("[OSb]"))
-            var.value = "400/800 (OS B)";
+        if (strcmp(var.value, "auto") == 0)
+            var.value = content_has_tag("[OSb]") ? "400/800 (OS B)" : "800XL (64K)";
 
         /* I moved "5200" comparison up to top because I'm lazy.  :P  Leave it here! */
         if (autorunCartridge == A5200_CART || (strcmp(var.value, "5200") == 0))
@@ -930,8 +930,8 @@ static void update_variables(void)
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
     {
-        if (content_has_tag("(PAL)"))
-            var.value = "PAL";
+        if (strcmp(var.value, "auto") == 0)
+            var.value = content_has_tag("(PAL)") ? "PAL" : "NTSC";
 
         if (strcmp(var.value, "NTSC") == 0)
         {
@@ -1034,8 +1034,8 @@ static void update_variables(void)
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
     {
-        if (content_has_tag("[BASIC]"))
-            var.value = "enabled";
+        if (strcmp(var.value, "auto") == 0)
+            var.value = content_has_tag("[BASIC]") ? "enabled" : "disabled";
 
         if (strcmp(var.value, "enabled") == 0)
         {
@@ -1249,8 +1249,9 @@ static void update_variables(void)
 
     if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
     {
-        if (HandleExtension((char*)RPATH, "cas") || HandleExtension((char*)RPATH, "CAS"))
-            var.value = "enabled";
+        if (strcmp(var.value, "auto") == 0)
+            var.value = HandleExtension((char*)RPATH, "cas") || HandleExtension((char*)RPATH, "CAS")
+                ? "enabled" : "disabled";
 
         if (strcmp(var.value, "enabled") == 0)
         {

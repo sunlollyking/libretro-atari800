@@ -430,15 +430,16 @@ struct retro_core_option_v2_definition option_defs_us[] = {
       "atari800_ntscpal",
       "Video Standard",
       NULL,
-      "Select whether emulated system is NTSC (60hz) or PAL (50hz)",
+      "Select whether emulated system is NTSC (60hz) or PAL (50hz).  Auto picks PAL for a TOSEC dump tagged (PAL), and NTSC otherwise.",
       NULL,
       "video",
       {
+         { "auto", "Auto" },
          { "NTSC", NULL },
          { "PAL",  NULL },
          { NULL, NULL },
       },
-      "disabled"
+      "auto"
    },
    {
       "atari800_artifacting_mode",
@@ -836,10 +837,11 @@ struct retro_core_option_v2_definition option_defs_us[] = {
       "atari800_system",
       "Atari System",
       NULL,
-      "Select system emulated.  Atari 5200 for Atari 5200 console games.  400/800 (OS B) for <48K games or ones that require OS/B.  800XL (64K) works for most content.  130XE (128K), Modern XL/XE(320K Compy Shop),  Modern XL/XE(576K), Modern XL/XE(1088K) for content that needs more than 64K.  Atari XE Game System for the Atari XE Game System or XEGS console games.",
+      "Select system emulated.  Atari 5200 for Atari 5200 console games.  400/800 (OS B) for <48K games or ones that require OS/B.  800XL (64K) works for most content.  130XE (128K), Modern XL/XE(320K Compy Shop),  Modern XL/XE(576K), Modern XL/XE(1088K) for content that needs more than 64K.  Atari XE Game System for the Atari XE Game System or XEGS console games.  Auto picks 400/800 (OS B) for a TOSEC dump tagged [OSb], and 800XL (64K) otherwise.",
       NULL,
       "system",
       {
+         { "auto", "Auto" },
          { "400/800 (OS B)", "Atari 400/800 (OS B)" },
          { "800XL (64K)", "Atari 800XL (64K)" },
          { "130XE (128K)", "Atari 130XE (128K)" },
@@ -850,21 +852,22 @@ struct retro_core_option_v2_definition option_defs_us[] = {
          { "5200", "Atari 5200 Super System" },
          { NULL, NULL },
       },
-      "800XL (64K)" // The Atari 800XL should be the default because most games will work on it, rather than the Atari 400/800.
+      "auto"
    },
    {
       "atari800_internalbasic",
       "Internal BASIC (hold OPTION on boot) (Restart)",
       NULL,
-      "Enable for content that needs Atari BASIC in order to run.  A proper ROM file (ATARIBAS.ROM) is needed.",
+      "Enable for content that needs Atari BASIC in order to run.  A proper ROM file (ATARIBAS.ROM) is needed.  Auto enables it for a TOSEC dump tagged [BASIC].",
       NULL,
       "system",
       {
+         { "auto", "Auto" },
          { "disabled", NULL },
          { "enabled",  NULL },
          { NULL, NULL },
       },
-      "disabled"
+      "auto"
    },
    {
       "atari800_os_800",
@@ -1164,15 +1167,16 @@ struct retro_core_option_v2_definition option_defs_us[] = {
       "atari800_cassboot",
       "Boot from Cassette (Reboot)",
       NULL,
-      "Forces emulated system to boot from autoboot cassette images by holding down the \"START\" key on boot.",
+      "Forces emulated system to boot from autoboot cassette images by holding down the \"START\" key on boot.  Auto enables it for .cas images.",
       NULL,
       "media",
       {
+         { "auto", "Auto" },
          { "disabled", NULL },
          { "enabled",  NULL },
          { NULL, NULL },
       },
-      "disabled"
+      "auto"
    },
    {
       "atari800_pokey_stereo",
